@@ -10,7 +10,7 @@ const progress = $("#progress");
 const verifySection = $("#verify-section");
 const resultsSection = $("#results-section");
 const stockRows = $("#stock-rows");
-const historyKey = "nordic-borsvakt-history-v1";
+const historyKey = "nm-help-history-v1";
 let selectedFile = null;
 
 function loadHistory() {
