@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="nb">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090e18" />
+    <meta name="description" content="Skjermbildebaserte børstips for Nordic Mafia." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Nordic Børsvakt</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Nordic Børsvakt, forsiden">
+        <span class="brand-mark">NB</span>
+        <span><strong>Nordic Børsvakt</strong><small>Nordic Mafia Companion</small></span>
+      </a>
+      <span class="status"><i></i> Lokal analyse</span>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">BØRSINTELLIGENS FOR SPILLET</p>
+        <h1>Fra skjermbilde til<br /><span>smartere børstips.</span></h1>
+        <p class="lead">Last opp et ferskt skjermbilde av børsen. Vi leser kursene, ser etter trend og risiko, og gir deg et tydelig tips.</p>
+        <div class="notice"><strong>Skjermbilde er påkrevd.</strong> Ingen tips opprettes uten et bilde fra Nordic Mafia-børsen.</div>
+      </section>
+
+      <section class="workspace card" aria-labelledby="upload-title">
+        <div class="step-label">STEG 1 AV 3</div>
+        <h2 id="upload-title">Last opp børsskjermbilde</h2>
+        <label class="dropzone" id="dropzone" for="screenshot">
+          <input id="screenshot" type="file" accept="image/png,image/jpeg,image/webp" />
+          <span class="upload-icon">＋</span>
+          <strong>Velg skjermbilde</strong>
+          <span>PNG, JPG eller WEBP</span>
+        </label>
+        <div class="preview-wrap hidden" id="preview-wrap">
+          <img id="preview" alt="Forhåndsvisning av børsskjermbildet" />
+          <button class="secondary" id="replace-image" type="button">Bytt bilde</button>
+        </div>
+        <div class="privacy-row"><span>▣</span><p><strong>Bildet blir på enheten din.</strong><br />OCR og analyse skjer lokalt i nettleseren.</p></div>
+        <button class="primary" id="scan-button" type="button" disabled>Les av skjermbildet</button>
+        <p class="progress hidden" id="progress" role="status"></p>
+      </section>
+
+      <section class="card hidden" id="verify-section" aria-labelledby="verify-title">
+        <div class="step-label">STEG 2 AV 3</div>
+        <h2 id="verify-title">Kontroller kursene</h2>
+        <p class="muted">OCR kan lese feil. Rett navn eller kurs før analysen.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aksje</th><th>Kurs</th><th></th></tr></thead>
+            <tbody id="stock-rows"></tbody>
+          </table>
+        </div>
+        <button class="secondary full" id="add-row" type="button">＋ Legg til aksje</button>
+        <button class="primary" id="analyze-button" type="button">Lag børstips</button>
+      </section>
+
+      <section class="hidden" id="results-section" aria-labelledby="results-title">
+        <div class="result-head">
+          <div><div class="step-label">STEG 3 AV 3</div><h2 id="results-title">Dine børstips</h2></div>
+          <button class="secondary" id="new-analysis" type="button">Nytt bilde</button>
+        </div>
+        <div class="summary-grid" id="summary-grid"></div>
+        <div class="tips-grid" id="tips-grid"></div>
+        <p class="disclaimer">Tipsene er statistiske vurderinger av et fiktivt spillmarked, ikke en garanti for gevinst. Du gjennomfører alltid handelen selv.</p>
+      </section>
+
+      <section class="history card" aria-labelledby="history-title">
+        <div class="section-head"><div><p class="eyebrow">LOKAL KURSHISTORIKK</p><h2 id="history-title">Tidligere analyser</h2></div><button class="text-button" id="clear-history" type="button">Slett historikk</button></div>
+        <div id="history-list" class="empty-state">Ingen analyser ennå. Last opp det første skjermbildet.</div>
+      </section>
+    </main>
+
+    <footer>Uavhengig hjelpeverktøy. Ikke tilknyttet Nordic Mafia eller Ellar Development AS.</footer>
+
+    <template id="row-template">
+      <tr><td><input class="stock-name" aria-label="Aksjenavn" placeholder="Aksjenavn" /></td><td><input class="stock-price" aria-label="Kurs" inputmode="decimal" placeholder="0,00" /></td><td><button class="remove-row" type="button" aria-label="Fjern rad">×</button></td></tr>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
