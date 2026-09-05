@@ -250,4 +250,12 @@ renderStrategies();
 renderStocks();
 setupSearch();
 renderHistory();
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("service-worker.js");
+if ("serviceWorker" in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) return;
+    refreshing = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register("service-worker.js?v=6").then((registration) => registration.update());
+}
