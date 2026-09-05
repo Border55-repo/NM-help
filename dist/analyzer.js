@@ -8,9 +8,54 @@ export function normalizePrice(value) {
   return Number.parseFloat(cleaned);
 }
 
-export function parseMarketText(text) {
+function normalizeWords(value) {
+  return String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function editDistance(a, b) {
+  const row = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i += 1) {
+    let diagonal = row[0];
+    row[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const previous = row[j];
+      row[j] = Math.min(row[j] + 1, row[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diagonal = previous;
+    }
+  }
+  return row[b.length];
+}
+
+function findKnownStock(line, catalogue) {
+  const normalized = normalizeWords(line);
+  const tokens = normalized.split(" ");
+  return catalogue.find((stock) => {
+    const ticker = normalizeWords(stock.ticker);
+    const name = normalizeWords(stock.name);
+    return normalized.includes(name) || tokens.some((token) => token === ticker || (token.length === ticker.length && editDistance(token, ticker) <= 1));
+  });
+}
+
+function extractPrice(line) {
+  const withCurrency = line.match(/([0-9][0-9 .]*(?:[,.][0-9]{1,2})?)\s*kr\b/i);
+  if (withCurrency) return normalizePrice(withCurrency[1]);
+  const beforeChange = line.match(/([0-9][0-9 ]*(?:[,.][0-9]{1,2})?)\s+(?=[+-]?[0-9]+(?:[,.][0-9]+)?\s*%)/);
+  return beforeChange ? normalizePrice(beforeChange[1]) : NaN;
+}
+
+export function parseMarketText(text, catalogue = []) {
   const rows = [];
   const lines = String(text ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  if (catalogue.length) {
+    for (let index = 0; index < lines.length; index += 1) {
+      const stock = findKnownStock(lines[index], catalogue);
+      if (!stock || rows.some((row) => row.ticker === stock.ticker)) continue;
+      let price = extractPrice(lines[index]);
+      if (!Number.isFinite(price)) price = extractPrice(lines[index + 1] ?? "");
+      if (Number.isFinite(price) && price > 0) rows.push({ ticker: stock.ticker, name: `${stock.ticker} · ${stock.name}`, price });
+    }
+    if (rows.length) return rows;
+  }
   for (const line of lines) {
     const match = line.match(/^(.{2,40}?)\s+(?:kr\s*)?([0-9][0-9 .]*(?:[,.][0-9]{1,2})?)\s*(?:kr)?$/i);
     if (!match) continue;

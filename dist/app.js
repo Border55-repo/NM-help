@@ -70,10 +70,26 @@ function renderStocks() {
 
 function buildSearchIndex() {
   return [
-    ...missions.map((mission) => ({ type: "Oppdrag", title: `Oppdrag ${mission.number}: ${mission.title}`, text: `${mission.goal} ${mission.tips.join(" ")} ${mission.reward} ${mission.tags}`, href: `#oppdrag-${mission.number}` })),
-    ...rankData.map((item, index) => ({ type: "Rank", title: item.rank, text: `rank xp rankbar ${Object.keys(item.rates).join(" ")}`, href: "#rank", rankIndex: index })),
-    ...strategies.map((item) => ({ type: "Tips", title: item.title, text: item.text, href: "#aktivitet" })),
-    ...stocks.map((stock) => ({ type: "Aksje", title: `${stock.ticker} · ${stock.name}`, text: `børs aksje ticker ${stock.ticker} ${stock.name}`, href: "#bors" }))
+    ...missions.map((mission) => ({
+      type: "Oppdrag",
+      title: `Oppdrag ${mission.number}: ${mission.title}`,
+      summary: `${mission.goal} Åpne guiden for fremgangsmåte${mission.reward === "Ikke oppgitt" ? "." : ` og belønning på ${mission.reward}.`}`,
+      keywords: `oppdrag mission ${mission.number} ${mission.title} ${mission.goal} ${mission.tags}`,
+      href: `#oppdrag-${mission.number}`
+    })),
+    ...rankData.map((item, index) => {
+      const best = Object.entries(item.rates).sort((a, b) => b[1] - a[1])[0];
+      return {
+        type: "Rank",
+        title: item.rank,
+        summary: `Beste registrerte aktivitet er ${best[0]} med ${formatPercent(best[1])} per handling. Åpne kalkulatoren for antall til neste rank.`,
+        keywords: `rank xp rankbar kalkulator ${item.rank}`,
+        href: "#rank",
+        rankIndex: index
+      };
+    }),
+    ...strategies.map((item) => ({ type: "Tips", title: item.title, summary: item.text, keywords: `tips aktivitet økonomi penger ${item.title} ${item.text}`, href: "#aktivitet" })),
+    ...stocks.map((stock) => ({ type: "Aksje", title: `${stock.ticker} · ${stock.name}`, summary: "Fast aksje på Nordic Mafia-børsen. Last opp et skjermbilde for å lese gjeldende kurs.", keywords: `børs aksje ticker kurs ${stock.ticker} ${stock.name}`, href: "#bors" }))
   ];
 }
 
@@ -86,9 +102,16 @@ function setupSearch() {
     const query = rawQuery.trim().toLocaleLowerCase("nb-NO");
     if (!query) { section.classList.add("hidden"); holder.innerHTML = ""; return; }
     const terms = query.split(/\s+/).filter(Boolean);
-    const matches = index.filter((item) => terms.every((term) => `${item.title} ${item.text}`.toLocaleLowerCase("nb-NO").includes(term))).slice(0, 12);
+    const matches = index.map((item) => {
+      const title = item.title.toLocaleLowerCase("nb-NO");
+      const type = item.type.toLocaleLowerCase("nb-NO");
+      const keywords = item.keywords.toLocaleLowerCase("nb-NO");
+      if (!terms.every((term) => `${title} ${type} ${keywords}`.includes(term))) return null;
+      const score = terms.reduce((total, term) => total + (title === term ? 8 : title.includes(term) ? 5 : type.includes(term) ? 3 : 1), 0);
+      return { ...item, score };
+    }).filter(Boolean).sort((a, b) => b.score - a.score).slice(0, 8);
     section.classList.remove("hidden");
-    holder.innerHTML = matches.length ? matches.map((item) => `<a href="${item.href}" data-rank-index="${item.rankIndex ?? ""}"><span>${item.type}</span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.text.slice(0, 145))}${item.text.length > 145 ? " …" : ""}</small></a>`).join("") : `<div class="empty-state">Ingen treff på «${escapeHtml(rawQuery)}». Prøv et oppdragsnummer, en rank eller en aktivitet.</div>`;
+    holder.innerHTML = matches.length ? matches.map((item) => `<a href="${item.href}" data-rank-index="${item.rankIndex ?? ""}"><span>${item.type}</span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.summary)}</small><b>Åpne →</b></a>`).join("") : `<div class="empty-state">Ingen treff på «${escapeHtml(rawQuery)}». Prøv et oppdragsnummer, en rank eller en aktivitet.</div>`;
     holder.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => {
       const rankIndex = link.dataset.rankIndex;
       if (rankIndex !== "") { $("#rank-select").value = rankIndex; $("#rank-select").dispatchEvent(new Event("change")); }
@@ -160,13 +183,16 @@ scanButton.addEventListener("click", async () => {
         if (status === "recognizing text") progress.textContent = `Leser skjermbildet … ${Math.round(value * 100)} %`;
       }
     });
-    parsed = parseMarketText(result.data.text);
-    progress.textContent = parsed.length ? `${parsed.length} kurser funnet. Kontroller dem under.` : "Ingen sikre kurser ble funnet. Legg dem inn fra bildet under.";
+    parsed = parseMarketText(result.data.text, stocks);
+    progress.textContent = parsed.length ? `${parsed.length} av ${stocks.length} kurser funnet. Kontroller dem under.` : "Ingen sikre kurser ble funnet. Aksjenavnene er fylt inn, legg inn kursene fra bildet.";
   } catch (error) {
     progress.textContent = `${error.message} Legg inn kursene fra bildet manuelt under.`;
   }
   stockRows.innerHTML = "";
-  (parsed.length ? parsed : [{ name: "", price: "" }, { name: "", price: "" }]).forEach(addRow);
+  stocks.map((stock) => {
+    const detected = parsed.find((item) => item.ticker === stock.ticker || item.name.toLowerCase().includes(stock.ticker.toLowerCase()));
+    return detected ?? { name: `${stock.ticker} · ${stock.name}`, price: "" };
+  }).forEach(addRow);
   verifySection.classList.remove("hidden");
   verifySection.scrollIntoView({ behavior: "smooth" });
   scanButton.disabled = false;

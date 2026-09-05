@@ -13,6 +13,24 @@ test("leser navn og kurs fra OCR-tekst", () => {
   ]);
 });
 
+test("kobler kjent ticker og selskapsnavn til kurs i en børsrad", () => {
+  const catalogue = [
+    { ticker: "NMB", name: "DNB Bank ASA" },
+    { ticker: "NAS", name: "Norwegian Air Shuttle ASA" }
+  ];
+  assert.deepEqual(parseMarketText("NMB DNB Bank ASA 2 586 kr +1.29%\nNAS Norwegian Air Shuttle ASA 682 kr +5.08%", catalogue), [
+    { ticker: "NMB", name: "NMB · DNB Bank ASA", price: 2586 },
+    { ticker: "NAS", name: "NAS · Norwegian Air Shuttle ASA", price: 682 }
+  ]);
+});
+
+test("tåler én OCR-feil i en kjent ticker", () => {
+  const catalogue = [{ ticker: "PHARM", name: "Photon Pharma AS" }];
+  assert.deepEqual(parseMarketText("PHARH Photon Pharma AS 600 kr +2.56%", catalogue), [
+    { ticker: "PHARM", name: "PHARM · Photon Pharma AS", price: 600 }
+  ]);
+});
+
 test("krever historikk før sterkt signal", () => {
   const [result] = analyzeStocks([{ name: "Nordic Oil", price: 100 }], []);
   assert.equal(result.signal, "HOLD");
