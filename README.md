@@ -13,7 +13,7 @@ Et mobilvennlig og installerbart hjelpeverktøy for Nordic Mafia-spillere. Appen
 
 - lokal OCR av skjermbilder med Tesseract.js
 - søk på tvers av oppdrag, ranker, aktiviteter og aksjer
-- rankkalkulator med XP/prosent per aktivitet for Sivilist–Don
+- rankkalkulator med XP/prosent per aktivitet for Sivilist–Don og antall handlinger til neste rank
 - trinnvise guider for oppdrag 1–9
 - oversikt over alle 12 aksjer på Nordic Mafia-børsen
 - tips til aktivitet, frakt, samarbeid og spilløkonomi

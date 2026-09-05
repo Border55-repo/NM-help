@@ -20,10 +20,14 @@ function formatPercent(value) {
 
 function renderRankTool() {
   const select = $("#rank-select");
+  const currentInput = $("#current-rank");
   select.innerHTML = rankData.map((item, index) => `<option value="${index}">${escapeHtml(item.rank)}</option>`).join("");
   select.value = String(Math.max(0, rankData.findIndex((item) => item.rank === "Gangster")));
-  const update = () => {
+  const update = (resetCurrent = false) => {
     const item = rankData[Number(select.value)];
+    if (resetCurrent) currentInput.value = String(item.start ?? 0);
+    const current = Math.min(99.9999, Math.max(0, Number(String(currentInput.value).replace(",", ".")) || 0));
+    const remaining = Math.max(0, 100 - current);
     const count = Math.max(1, Number($("#action-count").value) || 1);
     const rates = Object.entries(item.rates).sort((a, b) => b[1] - a[1]);
     const max = rates[0][1] || 1;
@@ -31,16 +35,17 @@ function renderRankTool() {
     $("#rank-summary").innerHTML = `
       <article><small>VALGT RANK</small><strong>${escapeHtml(item.rank)}</strong><span>${item.start === null ? "Start-rank" : `Rankbar starter rundt ${formatPercent(item.start)}`}</span></article>
       <article><small>BEST PER HANDLING</small><strong>${escapeHtml(best[0])}</strong><span>${formatPercent(best[1])} rank</span></article>
-      <article><small>CA. HANDLINGER FOR 100 %</small><strong>${best[1] ? Math.ceil(100 / best[1]).toLocaleString("nb-NO") : "–"}</strong><span>med beste aktivitet alene</span></article>`;
+      <article><small>BESTE VEI TIL NESTE RANK</small><strong>${best[1] ? Math.ceil(remaining / best[1]).toLocaleString("nb-NO") : "–"}</strong><span>${formatPercent(remaining)} gjenstår · ${escapeHtml(best[0])}</span></article>`;
     $("#activity-bars").innerHTML = rates.map(([name, rate], index) => `
       <article class="activity-row ${index === 0 ? "best" : ""}">
-        <div><strong>${escapeHtml(name)}</strong><span>${formatPercent(rate)} per handling · ${formatPercent(rate * count)} for ${count.toLocaleString("nb-NO")}</span></div>
+        <div><strong>${escapeHtml(name)}</strong><span>${formatPercent(rate)} per handling · ${rate ? Math.ceil(remaining / rate).toLocaleString("nb-NO") : "–"} handlinger til neste rank · ${formatPercent(rate * count)} for ${count.toLocaleString("nb-NO")}</span></div>
         <div class="bar"><i style="width:${Math.max(rate ? 3 : 0, (rate / max) * 100)}%"></i></div>
       </article>`).join("");
   };
-  select.addEventListener("change", update);
-  $("#action-count").addEventListener("input", update);
-  update();
+  select.addEventListener("change", () => update(true));
+  currentInput.addEventListener("input", () => update(false));
+  $("#action-count").addEventListener("input", () => update(false));
+  update(true);
 }
 
 function renderMissions() {
