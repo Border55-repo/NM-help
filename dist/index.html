@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#090e18" />
-    <meta name="description" content="Skjermbildebaserte børstips for Nordic Mafia." />
+    <meta name="description" content="Søkbar spillerhjelp, rankkalkulator, oppdragsguider og skjermbildebaserte børstips for Nordic Mafia." />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
@@ -16,20 +16,77 @@
         <span class="brand-mark">NM</span>
         <span><strong>NM Help</strong><small>Nordic Mafia Companion</small></span>
       </a>
-      <span class="status"><i></i> Lokal analyse</span>
+      <nav class="topnav" aria-label="Hovedmeny">
+        <a href="#hjelp">Hjelp</a>
+        <a href="#rank">Rank</a>
+        <a href="#oppdrag">Oppdrag</a>
+        <a href="#bors">Børs</a>
+      </nav>
     </header>
 
     <main id="top">
-      <section class="hero">
-        <p class="eyebrow">BØRSINTELLIGENS FOR SPILLET</p>
-        <h1>Fra skjermbilde til<br /><span>smartere børstips.</span></h1>
-        <p class="lead">Last opp et ferskt skjermbilde av børsen. Vi leser kursene, ser etter trend og risiko, og gir deg et tydelig tips.</p>
-        <div class="notice"><strong>Skjermbilde er påkrevd.</strong> Ingen tips opprettes uten et bilde fra Nordic Mafia-børsen.</div>
+      <section class="hero" id="hjelp">
+        <p class="eyebrow">SPILLERHJELP FOR NORDIC MAFIA</p>
+        <h1>Finn svaret.<br /><span>Spill smartere.</span></h1>
+        <p class="lead">Søk etter oppdrag, rank, aktiviteter, penger eller børs. NM Help samler guider og kalkulatorer på ett sted.</p>
+        <label class="help-search" for="help-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="help-search" type="search" placeholder="Søk etter f.eks. Oppdrag 3, Mercedes eller Hitman" autocomplete="off" />
+          <kbd>/</kbd>
+        </label>
+        <div class="quick-links" aria-label="Populære søk">
+          <button type="button" data-search="oppdrag">Oppdrag</button>
+          <button type="button" data-search="rank">XP per rank</button>
+          <button type="button" data-search="penger">Tjene penger</button>
+          <button type="button" data-search="børs">Børstips</button>
+        </div>
       </section>
 
-      <section class="workspace card" aria-labelledby="upload-title">
+      <section class="search-results hidden" id="search-results" aria-live="polite" aria-labelledby="search-title">
+        <div class="section-head compact"><div><p class="eyebrow">SØKERESULTATER</p><h2 id="search-title">Treff i NM Help</h2></div><button class="text-button" id="clear-search" type="button">Nullstill</button></div>
+        <div class="result-list" id="result-list"></div>
+      </section>
+
+      <section class="guide-overview" aria-label="Hjelpekategorier">
+        <a class="guide-tile" href="#rank"><span>01</span><strong>Rank & XP</strong><small>Sammenlign aktiviteter og regn ut handlinger</small></a>
+        <a class="guide-tile" href="#oppdrag"><span>02</span><strong>Oppdragsguide</strong><small>Trinnvis hjelp til oppdrag 1–9</small></a>
+        <a class="guide-tile" href="#aktivitet"><span>03</span><strong>Aktivitet & penger</strong><small>Prioriter det som gir fremgang</small></a>
+        <a class="guide-tile" href="#bors"><span>04</span><strong>Børsanalyse</strong><small>Last opp skjermbilde og få tips</small></a>
+      </section>
+
+      <section class="card guide-section" id="rank" aria-labelledby="rank-title">
+        <div class="section-head compact"><div><p class="eyebrow">RANKVERKTØY</p><h2 id="rank-title">XP per aktivitet</h2></div><span class="data-badge">Spillerdata</span></div>
+        <p class="muted section-copy">Velg rank for å se hva som gir mest rankprosent. Tallene er omtrentlige og kan endres når spillet oppdateres.</p>
+        <div class="rank-controls">
+          <label>Din rank<select id="rank-select"></select></label>
+          <label>Antall handlinger<input id="action-count" type="number" min="1" max="10000" value="10" inputmode="numeric" /></label>
+        </div>
+        <div class="rank-summary" id="rank-summary"></div>
+        <div class="activity-bars" id="activity-bars"></div>
+      </section>
+
+      <section class="guide-section" id="oppdrag" aria-labelledby="mission-title">
+        <div class="section-head"><div><p class="eyebrow">SPOILERADVARSEL</p><h2 id="mission-title">Oppdragsguide 1–9</h2></div><span class="data-badge">Fra spillere</span></div>
+        <p class="muted section-copy">Åpne oppdraget du står fast på. Guidene inneholder løsninger og kan avsløre hele oppdraget.</p>
+        <div class="mission-grid" id="mission-grid"></div>
+      </section>
+
+      <section class="card guide-section" id="aktivitet" aria-labelledby="activity-title">
+        <div class="section-head compact"><div><p class="eyebrow">AKTIVITET & ØKONOMI</p><h2 id="activity-title">Hva bør du prioritere?</h2></div></div>
+        <div class="strategy-grid" id="strategy-grid"></div>
+        <div class="notice source-note"><strong>Viktig:</strong> Prisforskjeller, belønninger og mekanikker kan bli endret. Kontroller alltid tallene i spillet før du bruker mye spillvaluta.</div>
+      </section>
+
+      <section class="workspace card guide-section" id="bors" aria-labelledby="upload-title">
+        <p class="eyebrow">BØRSVERKTØY</p>
+        <h2>Analyser Nordic Mafia-børsen</h2>
+        <p class="muted section-copy">Denne delen krever et ferskt skjermbilde. Bildet og kurshistorikken behandles lokalt på enheten din.</p>
+        <details class="stock-directory">
+          <summary>Se alle aksjene i spillet <span>12 aksjer</span></summary>
+          <div class="stock-list" id="stock-list"></div>
+        </details>
         <div class="step-label">STEG 1 AV 3</div>
-        <h2 id="upload-title">Last opp børsskjermbilde</h2>
+        <h3 id="upload-title" class="tool-title">Last opp børsskjermbilde</h3>
         <label class="dropzone" id="dropzone" for="screenshot">
           <input id="screenshot" type="file" accept="image/png,image/jpeg,image/webp" />
           <span class="upload-icon">＋</span>
@@ -72,6 +129,12 @@
       <section class="history card" aria-labelledby="history-title">
         <div class="section-head"><div><p class="eyebrow">LOKAL KURSHISTORIKK</p><h2 id="history-title">Tidligere analyser</h2></div><button class="text-button" id="clear-history" type="button">Slett historikk</button></div>
         <div id="history-list" class="empty-state">Ingen analyser ennå. Last opp det første skjermbildet.</div>
+      </section>
+
+      <section class="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title">Kilder og kvalitet</h2>
+        <p>Grunninformasjonen om spillet er kontrollert mot Nordic Mafia og offentlig omtale. XP- og oppdragsdata er levert av spillere. Eldre hjelpesider er bare brukt som bakgrunn fordi spillet har blitt endret over tid.</p>
+        <div><a href="https://nordicmafia.org/" target="_blank" rel="noreferrer">Nordic Mafia</a><a href="https://no.wikipedia.org/wiki/Nordicmafia" target="_blank" rel="noreferrer">Spillhistorikk</a></div>
       </section>
     </main>
 
