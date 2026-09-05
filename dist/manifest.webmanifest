@@ -1,0 +1,10 @@
+{
+  "name": "Nordic Børsvakt",
+  "short_name": "Børsvakt",
+  "description": "Skjermbildebaserte børstips for Nordic Mafia.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090e18",
+  "theme_color": "#090e18",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
