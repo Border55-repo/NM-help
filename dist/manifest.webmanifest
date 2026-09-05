@@ -1,6 +1,6 @@
 {
-  "name": "Nordic Børsvakt",
-  "short_name": "Børsvakt",
+  "name": "NM Help",
+  "short_name": "NM Help",
   "description": "Skjermbildebaserte børstips for Nordic Mafia.",
   "start_url": "./",
   "display": "standalone",
