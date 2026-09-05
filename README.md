@@ -1,4 +1,4 @@
-# Nordic Børsvakt
+# NM Help
 
 En mobilvennlig og installerbar companion-app som lager børstips fra skjermbilder av Nordic Mafia-børsen.
 
