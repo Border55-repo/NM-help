@@ -1,5 +1,5 @@
 const CACHE = "nm-help-v6";
-const FILES = ["./", "index.html", "styles.css?v=6", "app.js?v=6", "analyzer.js", "guide-data.js", "manifest.webmanifest", "icon.svg"];
+const FILES = ["./", "index.html", "styles.css?v=6", "app.js?v=6", "status-check.js?v=1", "analyzer.js", "guide-data.js", "manifest.webmanifest", "icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)).then(() => self.skipWaiting()));

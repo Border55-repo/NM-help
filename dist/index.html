@@ -137,6 +137,15 @@
         <p>Grunninformasjonen om spillet er kontrollert mot Nordic Mafia og offentlig omtale. XP- og oppdragsdata er levert av spillere. Eldre hjelpesider er bare brukt som bakgrunn fordi spillet har blitt endret over tid.</p>
         <div><a href="https://nordicmafia.org/" target="_blank" rel="noreferrer">Nordic Mafia</a><a href="https://no.wikipedia.org/wiki/Nordicmafia" target="_blank" rel="noreferrer">Spillhistorikk</a></div>
       </section>
+      <section class="card status-card" aria-labelledby="status-title">
+        <div>
+          <p class="eyebrow">DRIFTSSTATUS</p>
+          <h2 id="status-title">Virker hjelpeverktøyet?</h2>
+          <p>Kontrollerer appfiler, lokal lagring, installasjon og OCR – uten å sende innholdet ditt noe sted.</p>
+        </div>
+        <button id="status-check" class="primary-action" type="button">Sjekk status</button>
+        <div id="status-result" class="status-result" role="status" aria-live="polite">Ingen kontroll kjørt ennå.</div>
+      </section>
     </main>
 
     <footer>Uavhengig hjelpeverktøy. Ikke tilknyttet Nordic Mafia eller Ellar Development AS.</footer>
@@ -146,6 +155,7 @@
     </template>
 
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="status-check.js?v=1" defer></script>
     <script type="module" src="app.js?v=6"></script>
   </body>
 </html>
