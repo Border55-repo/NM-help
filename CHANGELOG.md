@@ -4,7 +4,7 @@ Alle vesentlige endringer i NM Help dokumenteres her.
 
 ## [Uutgitt]
 
-- Ingen endringer registrert ennå.
+- Koblet appen til kontrollpanelets sentrale vedlikeholdsmodus med automatisk utløp og sikker fail-open.
 
 ## [2.0.0]
 
